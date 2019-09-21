@@ -41,7 +41,7 @@ describe('AzureMonitorQueryCtrl', () => {
       expect(queryCtrl.target.azureMonitor.data.singleResource.resourceName).toBe('select');
       expect(queryCtrl.target.azureMonitor.data.singleResource.metricNamespace).toBe('select');
       expect(queryCtrl.target.azureMonitor.data.singleResource.metricName).toBe('select');
-      expect(queryCtrl.target.appInsights.groupBy).toBe('none');
+      expect(queryCtrl.target.appInsights.dimension).toBe('none');
     });
   });
 

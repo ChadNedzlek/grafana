@@ -64,19 +64,46 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
       workspace: string;
     };
     appInsights: {
-      metricName: string;
       rawQuery: boolean;
-      rawQueryString: string;
-      groupBy: string;
-      timeGrainType: string;
-      xaxis: string;
-      yaxis: string;
-      spliton: string;
+      // metric style query when rawQuery == false
+      metricName: string;
+
+      // deprecated -> dimension
+      groupBy?: string;
+      dimension: any;
+
+      // deprecated -> dimesionFilter
+      filter: string;
+      dimensionFilter: string;
+
+      // deprecated -> dimensions
+      groupByOptions?: string[];
+      dimensions: string[];
+
       aggOptions: string[];
       aggregation: string;
-      groupByOptions: string[];
+
+      timeGrainType: string;
+      timeGrainCount: string;
       timeGrainUnit: string;
       timeGrain: string;
+      timeGrains: Option[];
+      allowedTimeGrainsMs: number[];
+
+      // query style query when rawQuery == true
+      rawQueryString: string;
+
+      // deprecated -> timeColumn
+      xaxis?: string;
+      timeColumn: string;
+
+      // deprecated -> valueColumn
+      yaxis?: string;
+      valueColumn: string;
+
+      // deprecated -> segmentColumn
+      spliton?: string;
+      segmentColumn: string;
     };
   };
 
@@ -130,10 +157,9 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
       rawQuery: false,
       rawQueryString: '',
       groupBy: 'none',
-      timeGrainType: 'auto',
-      xaxis: 'timestamp',
-      yaxis: '',
-      spliton: '',
+      timeGrain: 'auto',
+      timeColumn: 'timestamp',
+      valueColumn: '',
     },
   };
 
@@ -161,6 +187,8 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
     this.migrateToFromTimes();
 
     this.migrateToDefaultNamespace();
+
+    this.migrateApplicationInsightsKeys();
 
     this.panelCtrl.events.on('data-received', this.onDataReceived.bind(this), $scope);
     this.panelCtrl.events.on('data-error', this.onDataError.bind(this), $scope);
@@ -234,28 +262,44 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
 
   migrateTimeGrains() {
     const { queryMode } = this.target.azureMonitor;
-    if (this.target.azureMonitor.data[queryMode].timeGrainUnit) {
-      if (this.target.azureMonitor.data[queryMode].timeGrain !== 'auto') {
-        this.target.azureMonitor.data[queryMode].timeGrain = TimegrainConverter.createISO8601Duration(
-          this.target.azureMonitor.data[queryMode].timeGrain,
-          this.target.azureMonitor.data[queryMode].timeGrainUnit
-        );
+
+    interface TimeGrainedData {
+      timeGrainUnit?: string;
+      timeGrain: string;
+      timeGrains: Array<Option>;
+      allowedTimeGrainsMs: number[];
+    };
+
+    const _this = this;
+
+    function migrate(data: TimeGrainedData):void{
+      if (data.timeGrainUnit) {
+        if (data.timeGrain !== 'auto') {
+          data.timeGrain = TimegrainConverter.createISO8601Duration(
+            data.timeGrain,
+            data.timeGrainUnit
+          );
+        }
+
+        delete data.timeGrainUnit;
+        _this.onMetricNameChange();
       }
 
-      delete this.target.azureMonitor.data[queryMode].timeGrainUnit;
-      this.onMetricNameChange();
+      if (
+        data.timeGrains &&
+        data.timeGrains.length > 0 &&
+        (!data.allowedTimeGrainsMs ||
+          data.allowedTimeGrainsMs.length === 0)
+      ) {
+        data.allowedTimeGrainsMs = _this.convertTimeGrainsToMs(
+          data.timeGrains
+        );
+      }
     }
 
-    if (
-      this.target.azureMonitor.data[queryMode].timeGrains &&
-      this.target.azureMonitor.data[queryMode].timeGrains.length > 0 &&
-      (!this.target.azureMonitor.data[queryMode].allowedTimeGrainsMs ||
-        this.target.azureMonitor.data[queryMode].allowedTimeGrainsMs.length === 0)
-    ) {
-      this.target.azureMonitor.data[queryMode].allowedTimeGrainsMs = this.convertTimeGrainsToMs(
-        this.target.azureMonitor.data[queryMode].timeGrains
-      );
-    }
+    migrate(this.target.azureMonitor.data[queryMode]);
+    migrate(this.target.appInsights);
+
   }
 
   migrateToFromTimes() {
@@ -276,6 +320,40 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
     this.target.azureMonitor.data[queryMode].metricNamespace = this.target.azureMonitor.data[
       queryMode
     ].metricDefinition;
+  }
+
+  migrateApplicationInsightsKeys() : void {
+    const appInsights = this.target.appInsights;
+
+    if (appInsights.xaxis) {
+      appInsights.timeColumn = appInsights.xaxis;
+      delete appInsights.xaxis
+    }
+
+    if (appInsights.yaxis) {
+      appInsights.valueColumn = appInsights.yaxis;
+      delete appInsights.yaxis
+    }
+
+    if (appInsights.spliton) {
+      appInsights.segmentColumn = appInsights.spliton;
+      delete appInsights.spliton
+    }
+
+    if (appInsights.groupBy) {
+      appInsights.dimension = appInsights.groupBy;
+      delete appInsights.groupBy;
+    }
+
+    if (appInsights.groupByOptions) {
+      appInsights.dimensions = appInsights.groupByOptions;
+      delete appInsights.groupByOptions;
+    }
+
+    if (appInsights.filter) {
+      appInsights.dimensionFilter = appInsights.filter;
+      delete appInsights.filter;
+    }
   }
 
   replace(variable: string) {
@@ -801,6 +879,13 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
       this.target.appInsights.timeGrainUnit = 'minute';
     } else {
       this.target.appInsights.timeGrain = '';
+    }
+    this.refresh();
+  }
+
+  updateAppInsightsTimeGrain() {
+    if (this.target.appInsights.timeGrainUnit && this.target.appInsights.timeGrainCount) {
+      this.target.appInsights.timeGrain = TimegrainConverter.createISO8601Duration(this.target.appInsights.timeGrainCount, this.target.appInsights.timeGrainUnit);
     }
     this.refresh();
   }
