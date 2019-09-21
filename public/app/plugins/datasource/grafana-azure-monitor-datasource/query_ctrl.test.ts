@@ -41,7 +41,7 @@ describe('AzureMonitorQueryCtrl', () => {
       expect(queryCtrl.target.azureMonitor.resourceName).toBe('select');
       expect(queryCtrl.target.azureMonitor.metricNamespace).toBe('select');
       expect(queryCtrl.target.azureMonitor.metricName).toBe('select');
-      expect(queryCtrl.target.appInsights.groupBy).toBe('none');
+      expect(queryCtrl.target.appInsights.dimension).toBe('none');
     });
   });
 
@@ -226,9 +226,9 @@ describe('AzureMonitorQueryCtrl', () => {
 
       it('should set the options and default selected value for the Aggregations dropdown', () => {
         queryCtrl.onMetricNameChange().then(() => {
-          expect(queryCtrl.target.azureMonitor.aggregation).toBe('Average');
-          expect(queryCtrl.target.azureMonitor.aggOptions).toBe(['Average', 'Total']);
-          expect(queryCtrl.target.azureMonitor.timeGrains).toBe(['PT1M', 'P1D']);
+          expect(queryCtrl.cache.azureMonitor.aggregation).toBe('Average');
+          expect(queryCtrl.cache.azureMonitor.aggOptions).toBe(['Average', 'Total']);
+          expect(queryCtrl.cache.azureMonitor.timeGrains).toBe(['PT1M', 'P1D']);
         });
       });
     });
@@ -255,7 +255,7 @@ describe('AzureMonitorQueryCtrl', () => {
 
     describe('when getOptions for the GroupBy segments dropdown is called', () => {
       beforeEach(() => {
-        queryCtrl.target.appInsights.groupByOptions = ['opt1', 'opt2'];
+        queryCtrl.cache.appInsights.groupByOptions = ['opt1', 'opt2'];
       });
 
       it('should return a list of GroupBy segments', () => {
@@ -285,10 +285,10 @@ describe('AzureMonitorQueryCtrl', () => {
       it('should set the options and default selected value for the Aggregations dropdown', () => {
         return queryCtrl.onAppInsightsMetricNameChange().then(() => {
           expect(queryCtrl.target.appInsights.aggregation).toBe('avg');
-          expect(queryCtrl.target.appInsights.aggOptions).toContain('avg');
-          expect(queryCtrl.target.appInsights.aggOptions).toContain('sum');
-          expect(queryCtrl.target.appInsights.groupByOptions).toContain('client/os');
-          expect(queryCtrl.target.appInsights.groupByOptions).toContain('client/city');
+          expect(queryCtrl.cache.appInsights.aggOptions).toContain('avg');
+          expect(queryCtrl.cache.appInsights.aggOptions).toContain('sum');
+          expect(queryCtrl.cache.appInsights.groupByOptions).toContain('client/os');
+          expect(queryCtrl.cache.appInsights.groupByOptions).toContain('client/city');
         });
       });
     });
