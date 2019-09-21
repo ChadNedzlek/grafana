@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import { migrateTargetSchema } from './migrations';
 import AzureMonitorDatasource from './azure_monitor/azure_monitor_datasource';
 import AppInsightsDatasource from './app_insights/app_insights_datasource';
 import AzureLogAnalyticsDatasource from './azure_log_analytics/azure_log_analytics_datasource';
@@ -37,7 +38,9 @@ export default class Datasource extends DataSourceApi<AzureMonitorQuery, AzureDa
     const appInsightsOptions = _.cloneDeep(options);
     const azureLogAnalyticsOptions = _.cloneDeep(options);
 
-    azureMonitorOptions.targets = _.filter(azureMonitorOptions.targets, ['queryType', 'Azure Monitor']);
+    azureMonitorOptions.targets = azureMonitorOptions.targets
+      .filter((t: any) => t.queryType === 'Azure Monitor')
+      .map((t: any) => migrateTargetSchema(t));
     appInsightsOptions.targets = _.filter(appInsightsOptions.targets, ['queryType', 'Application Insights']);
     azureLogAnalyticsOptions.targets = _.filter(azureLogAnalyticsOptions.targets, ['queryType', 'Azure Log Analytics']);
 
@@ -158,7 +161,7 @@ export default class Datasource extends DataSourceApi<AzureMonitorQuery, AzureDa
     resourceGroup: string,
     metricDefinition: string,
     resourceName: string,
-    metricNamespace: string
+    metricNamespace?: string
   ) {
     return this.azureMonitorDatasource.getMetricNames(
       subscriptionId,
@@ -183,17 +186,21 @@ export default class Datasource extends DataSourceApi<AzureMonitorQuery, AzureDa
     resourceGroup: string,
     metricDefinition: string,
     resourceName: string,
-    metricNamespace: string,
-    metricName: string
+    metricName: string,
+    metricNamespace?: string
   ) {
     return this.azureMonitorDatasource.getMetricMetadata(
       subscriptionId,
       resourceGroup,
       metricDefinition,
       resourceName,
-      metricNamespace,
-      metricName
+      metricName,
+      metricNamespace
     );
+  }
+
+  getResources(subscriptions: string[]) {
+    return this.azureMonitorDatasource.getResources(subscriptions);
   }
 
   /* Application Insights API method */
