@@ -67,17 +67,8 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
       rawQuery: boolean;
       // metric style query when rawQuery == false
       metricName: string;
-
-      // deprecated -> dimension
-      groupBy?: string;
       dimension: any;
-
-      // deprecated -> dimesionFilter
-      filter: string;
       dimensionFilter: string;
-
-      // deprecated -> dimensions
-      groupByOptions?: string[];
       dimensions: string[];
 
       aggOptions: string[];
@@ -92,17 +83,8 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
 
       // query style query when rawQuery == true
       rawQueryString: string;
-
-      // deprecated -> timeColumn
-      xaxis?: string;
       timeColumn: string;
-
-      // deprecated -> valueColumn
-      yaxis?: string;
       valueColumn: string;
-
-      // deprecated -> segmentColumn
-      spliton?: string;
       segmentColumn: string;
     };
   };
@@ -323,36 +305,23 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
   }
 
   migrateApplicationInsightsKeys() : void {
-    const appInsights = this.target.appInsights;
+    const appInsights = this.target.appInsights as any;
 
-    if (appInsights.xaxis) {
-      appInsights.timeColumn = appInsights.xaxis;
-      delete appInsights.xaxis
-    }
+    // Migrate old app insights data keys to match other datasources
+    const mappings = ({
+      "xazis" : "timeColumn",
+      "yaxis" : "valueColumn",
+      "spliton" : "segmentColumn",
+      "groupBy" : "dimension",
+      "groupByOptions" : "dimensions",
+      "filter" : "dimensionFilter",
+    }) as {[old: string] : string};
 
-    if (appInsights.yaxis) {
-      appInsights.valueColumn = appInsights.yaxis;
-      delete appInsights.yaxis
-    }
-
-    if (appInsights.spliton) {
-      appInsights.segmentColumn = appInsights.spliton;
-      delete appInsights.spliton
-    }
-
-    if (appInsights.groupBy) {
-      appInsights.dimension = appInsights.groupBy;
-      delete appInsights.groupBy;
-    }
-
-    if (appInsights.groupByOptions) {
-      appInsights.dimensions = appInsights.groupByOptions;
-      delete appInsights.groupByOptions;
-    }
-
-    if (appInsights.filter) {
-      appInsights.dimensionFilter = appInsights.filter;
-      delete appInsights.filter;
+    for(const old in mappings) {
+      if (appInsights[old]) {
+        appInsights[mappings[old]] = appInsights[old];
+        delete appInsights[old];
+      }
     }
   }
 
