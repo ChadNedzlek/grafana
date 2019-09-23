@@ -812,7 +812,7 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
       .getAppInsightsMetricMetadata(this.replace(this.target.appInsights.metricName))
       .then((aggData: { supportedAggTypes: string[]; supportedGroupBy: string[]; primaryAggType: string }) => {
         this.target.appInsights.aggOptions = aggData.supportedAggTypes;
-        this.target.appInsights.groupByOptions = aggData.supportedGroupBy;
+        this.target.appInsights.dimensions = aggData.supportedGroupBy;
         this.target.appInsights.aggregation = aggData.primaryAggType;
         return this.refresh();
       })
@@ -832,13 +832,13 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
   };
 
   getAppInsightsGroupBySegments(query: any) {
-    return _.map(this.target.appInsights.groupByOptions, option => {
+    return _.map(this.target.appInsights.dimensions, option => {
       return { text: option, value: option };
     });
   }
 
   resetAppInsightsGroupBy() {
-    this.target.appInsights.groupBy = 'none';
+    this.target.appInsights.dimension = 'none';
     this.refresh();
   }
 
