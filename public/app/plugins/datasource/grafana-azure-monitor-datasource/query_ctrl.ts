@@ -248,13 +248,13 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
     interface TimeGrainedData {
       timeGrainUnit?: string;
       timeGrain: string;
-      timeGrains: Array<Option>;
+      timeGrains: Option[];
       allowedTimeGrainsMs: number[];
-    };
+    }
 
     const _this = this;
 
-    function migrate(data: TimeGrainedData):void{
+    function migrate(data: TimeGrainedData): void {
       if (data.timeGrainUnit) {
         if (data.timeGrain !== 'auto') {
           data.timeGrain = TimegrainConverter.createISO8601Duration(
@@ -304,7 +304,7 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
     ].metricDefinition;
   }
 
-  migrateApplicationInsightsKeys() : void {
+  migrateApplicationInsightsKeys(): void {
     const appInsights = this.target.appInsights as any;
 
     // Migrate old app insights data keys to match other datasources
@@ -315,9 +315,9 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
       "groupBy" : "dimension",
       "groupByOptions" : "dimensions",
       "filter" : "dimensionFilter",
-    }) as {[old: string] : string};
+    }) as {[old: string]: string};
 
-    for(const old in mappings) {
+    for (const old in mappings) {
       if (appInsights[old]) {
         appInsights[mappings[old]] = appInsights[old];
         delete appInsights[old];
@@ -854,7 +854,10 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
 
   updateAppInsightsTimeGrain() {
     if (this.target.appInsights.timeGrainUnit && this.target.appInsights.timeGrainCount) {
-      this.target.appInsights.timeGrain = TimegrainConverter.createISO8601Duration(this.target.appInsights.timeGrainCount, this.target.appInsights.timeGrainUnit);
+      this.target.appInsights.timeGrain = TimegrainConverter.createISO8601Duration(
+        this.target.appInsights.timeGrainCount,
+        this.target.appInsights.timeGrainUnit
+      );
     }
     this.refresh();
   }
