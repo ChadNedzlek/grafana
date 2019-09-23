@@ -10,7 +10,7 @@
     <div class="gf-form" ng-if="ctrl.target.queryType === 'Azure Monitor'">
       <label class="gf-form-label query-keyword width-9">Query Mode</label>
       <div class="gf-form-select-wrapper gf-form-select-wrapper--caret-indent">
-        <select class="gf-form-input service-dropdown" ng-model="ctrl.target.azureMonitor.queryMode" 
+        <select class="gf-form-input service-dropdown" ng-model="ctrl.target.azureMonitor.queryMode"
         ng-options="f.value as f.text for f in [{value: 'singleResource', text: 'Single Resource'}, {value: 'crossResource', text: 'Multiple Resources'}]"
           ng-change="ctrl.refresh()"></select>
       </div>
@@ -18,7 +18,7 @@
     <div class="gf-form gf-form--grow">
       <div class="gf-form-label gf-form-label--grow"></div>
     </div>
-  </div>    
+  </div>
   <div class="gf-form-inline" ng-if="(ctrl.target.queryType === 'Azure Monitor' && ctrl.target.azureMonitor.queryMode === 'singleResource') || ctrl.target.queryType === 'Azure Log Analytics'">
     <div class="gf-form" >
       <label class="gf-form-label query-keyword width-9">Subscription</label>
@@ -37,7 +37,7 @@
         initial-values="ctrl.target.subscriptions"
         options="ctrl.subscriptionValues"
         on-updated="ctrl.onSubscriptionsChange(values)">
-      </multi-select> 
+      </multi-select>
     </div>
     <div class="gf-form gf-form--grow">
       <div class="gf-form-label gf-form-label--grow"></div>
@@ -73,7 +73,7 @@
         initial-values="ctrl.target.azureMonitor.data.crossResource.locations"
         options="ctrl.locations"
         on-updated="ctrl.onLocationsChange(values)">
-      </multi-select> 
+      </multi-select>
     </div>
     <div class="gf-form gf-form--grow">
       <div class="gf-form-label gf-form-label--grow"></div>
@@ -102,7 +102,6 @@
     <div class="gf-form gf-form--grow">
       <div class="gf-form-label gf-form-label--grow"></div>
     </div>
-  </div>
     <div class="gf-form-inline">
       <div class="gf-form" ng-if="ctrl.target.azureMonitor.queryMode === 'singleResource'">
         <label class="gf-form-label query-keyword width-9">Metric Namespace</label>
@@ -110,7 +109,7 @@
           get-options="ctrl.getMetricNamespaces($query)" on-change="ctrl.onMetricNamespacesChange()" css-class="min-width-12">
         </gf-form-dropdown>
       </div>
-      <div class="gf-form">        
+      <div class="gf-form">
         <label class="gf-form-label query-keyword width-9">Metric</label>
         <gf-form-dropdown ng-if="ctrl.target.azureMonitor.queryMode === 'singleResource'" model="ctrl.target.azureMonitor.data.singleResource.metricName" allow-custom="true" lookup-text="true"
           get-options="ctrl.getMetricNames($query)" on-change="ctrl.onMetricNameChange()" css-class="min-width-12">
@@ -130,7 +129,7 @@
         <div class="gf-form-label gf-form-label--grow"></div>
       </div>
     </div>
-    <div class="gf-form-inline">      
+    <div class="gf-form-inline">
       <div class="gf-form">
         <label class="gf-form-label query-keyword width-9">Time Grain</label>
         <div class="gf-form-select-wrapper gf-form-select-wrapper--caret-indent timegrainunit-dropdown-wrapper">
