@@ -272,7 +272,7 @@ func (e *ApplicationInsightsDatasource) parseTimeSeriesFromQuery(body []byte, qu
 	}
 
 	type Metadata struct {
-		Columns []string `json:"columns"'`
+		Columns []string `json:"columns"`
 	}
 
 	meta := Metadata{}
