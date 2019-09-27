@@ -146,10 +146,11 @@ func (e *ApplicationInsightsDatasource) buildQueries(queries []*tsdb.Query, time
 			dimension := strings.TrimSpace(fmt.Sprintf("%v", applicationInsightsTarget["dimension"]))
 			if applicationInsightsTarget["dimension"] != nil && len(dimension) > 0 && !strings.EqualFold(dimension, "none") {
 				params.Add("segment", dimension)
-				dimensionFilter := strings.TrimSpace(fmt.Sprintf("%v", applicationInsightsTarget["dimensionFilter"]))
-				if applicationInsightsTarget["dimensionFilter"] != nil && len(dimensionFilter) > 0 {
-					params.Add("filter", fmt.Sprintf("%v", dimension, dimensionFilter))
-				}
+			}
+
+			dimensionFilter := strings.TrimSpace(fmt.Sprintf("%v", applicationInsightsTarget["dimensionFilter"]))
+			if applicationInsightsTarget["dimensionFilter"] != nil && len(dimensionFilter) > 0 {
+				params.Add("filter", fmt.Sprintf("%v", dimensionFilter))
 			}
 
 			applicationInsightsQueries = append(applicationInsightsQueries, &ApplicationInsightsQuery{
