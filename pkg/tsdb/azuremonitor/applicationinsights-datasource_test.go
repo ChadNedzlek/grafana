@@ -109,7 +109,7 @@ func TestApplicationInsightsDatasource(t *testing.T) {
 						"alias":           "testalias",
 						"queryType":       "Application Insights",
 						"dimension":       "blob",
-						"dimensionFilter": "*",
+						"dimensionFilter": "blob eq '*'",
 					},
 				})
 

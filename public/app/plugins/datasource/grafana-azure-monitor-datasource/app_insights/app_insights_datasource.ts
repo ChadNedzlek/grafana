@@ -71,7 +71,6 @@ export default class AppInsightsDatasource {
     }
 
     // migration for non-standard names
-
     if (item.groupBy && !item.dimension) {
       item.dimension = item.groupBy;
     }

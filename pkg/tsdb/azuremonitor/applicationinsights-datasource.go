@@ -148,7 +148,7 @@ func (e *ApplicationInsightsDatasource) buildQueries(queries []*tsdb.Query, time
 				params.Add("segment", dimension)
 				dimensionFilter := strings.TrimSpace(fmt.Sprintf("%v", applicationInsightsTarget["dimensionFilter"]))
 				if applicationInsightsTarget["dimensionFilter"] != nil && len(dimensionFilter) > 0 {
-					params.Add("filter", fmt.Sprintf("%s eq '%s'", dimension, dimensionFilter))
+					params.Add("filter", fmt.Sprintf("%v", dimension, dimensionFilter))
 				}
 			}
 
@@ -572,15 +572,12 @@ func formatApplicationInsightsLegendKey(alias string, metricName string, dimensi
 		metaPartName = strings.Replace(metaPartName, "}}", "", 1)
 		metaPartName = strings.ToLower(strings.TrimSpace(metaPartName))
 
-		if metaPartName == "metric" {
+		switch metaPartName {
+		case "metric":
 			return []byte(metricName)
-		}
-
-		if metaPartName == "dimensionname" {
+		case "dimensionname", "groupbyname":
 			return []byte(dimensionName)
-		}
-
-		if metaPartName == "dimensionvalue" {
+		case "dimensionvalue", "groupbyvalue":
 			return []byte(dimensionValue)
 		}
 
